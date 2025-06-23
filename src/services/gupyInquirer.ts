@@ -10,16 +10,16 @@ export class GupyInquirer {
         name: 'dataType',
         message: 'Which data do you want to retrieve?',
         choices: [
-          '❌ Jobs Only', 
-          '✅ Jobs and Applications', 
-          '❌ Stages', 
-          '❌ Email Templates',
-          '❌ Job Templates'
+          '1✅ - Jobs Only', 
+          '2✅ - Jobs and Applications', 
+          '3❌ - Stages', 
+          '4❌ - Email Templates',
+          '5❌ - Job Templates'
         ],
       },
     ]);
 
-    return dataType;
+    return dataType.slice(0,1);
 
   }
 }

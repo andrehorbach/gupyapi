@@ -14,7 +14,7 @@ export class GupyAppService {
     private logger = new Logger()
   ) {}
   
-  async fetchAllData(): Promise<any[]> {
+  async fetchAppData(): Promise<any[]> {
     const limiter = new Bottleneck({ maxConcurrent: 3, minTime: 1 });
     // const jobs = await this.jobClient.fetchJobs();
     // Test Jobs Data:

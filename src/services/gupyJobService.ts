@@ -7,7 +7,7 @@ export class GupyJobService {
     private logger = new Logger()
   ) {}
   
-  async fetchAllData(): Promise<any[]> {
+  async fetchJobsData(): Promise<any[]> {
     try {
       const jobsData = await this.jobClient.fetchJobs();
       return jobsData;
