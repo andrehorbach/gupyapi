@@ -15,7 +15,9 @@ export class GupyService {
 
   async fetchAllData(): Promise<any[]> {
     // const jobs = await this.jobClient.fetchJobs();
+    // Test Jobs Data:
     const jobs = [{id: 918195}];
+
     const fullData: { jobId: number; applications: any[] }[] = [];
 
     for (const job of jobs) {
