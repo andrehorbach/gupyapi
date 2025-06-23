@@ -1,16 +1,15 @@
 import * as fs from 'fs/promises';
-import { truncateString } from './helpers/truncateString'
+import { truncateString } from './helpers/truncateString';
 
 export class FileWriter {
   async save(filename: string, data: any[]): Promise<void> {
-    const fileStream = await fs.open(filename, 'w');
-    fileStream.write('[');
-    for (let i = 0; i < data.length; i++) {
-      if (i > 0) fileStream.write(',\n');
-      fileStream.write(JSON.stringify(truncateString(data[i]), null, 2));
-    }
-    fileStream.write(']');
-    await fileStream.close();
+    const jsonContent = '[\n' +
+      data.map((item, index) => {
+        return JSON.stringify(truncateString(item), null, 2);
+      }).join(',\n') +
+      '\n]';
+
+    await fs.writeFile(filename, jsonContent, { encoding: 'utf-8' });
     console.log(`Data saved to ${filename}`);
   }
 }
