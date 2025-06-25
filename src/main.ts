@@ -2,10 +2,12 @@ import * as fs from 'fs/promises';
 import { JobClient } from './clients/jobClient';
 import { ApplicationClient } from './clients/applicationClient';
 import { ApplicationV2Client } from './clients/applicationV2Client';
+import { JobStageClient } from './clients/jobStageClient';
 import { CommentClient } from './clients/commentClient';
 import { Logger } from './utils/logger';
 import { GupyInquirer } from './services/gupyInquirer';
 import { GupyAppService } from './services/gupyAppService';
+import { GupyJobStageService } from './services/gupyStageService';
 import { FileWriter } from './utils/fileWriter';
 import { GupyJobService } from './services/gupyJobService';
 
@@ -16,6 +18,7 @@ const logger = new Logger();
 const jobsClient = new JobClient();
 const applicationsClient = new ApplicationClient();
 const applicationsV2Client = new ApplicationV2Client();
+const stagesClient = new JobStageClient();
 const commentsClient = new CommentClient();
 const gupyInquirer = new GupyInquirer();
 const fileWriter = new FileWriter();
@@ -28,7 +31,12 @@ const gupyAppService = new GupyAppService(
   jobsClient, 
   applicationsClient, 
   applicationsV2Client, 
-  commentsClient, 
+  commentsClient,
+  logger
+);
+const gupyJobStageService = new GupyJobStageService(
+  jobsClient,
+  stagesClient,
   logger
 );
 
@@ -38,8 +46,9 @@ async function main() {
   console.log("Selected Data Type: " + dataType);
 
   const dataFetch: Record<string, () => Promise<any[]>> = {
-      '1': () => gupyJobService.fetchJobsData(),
-      '2': () => gupyJobService.fetchJobsData(),
+      '1': () => gupyJobService.fetchJobData(),
+      '2': () => gupyAppService.fetchAppData(),
+      '3': () => gupyJobStageService.fetchJobStageData(),
   }
 
   const dataFetcher = dataFetch[dataType];

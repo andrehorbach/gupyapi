@@ -3,6 +3,7 @@ import { ApplicationClient } from '../clients/applicationClient';
 import { ApplicationV2Client } from '../clients/applicationV2Client';
 import { CommentClient } from '../clients/commentClient';
 import { Logger } from '../utils/logger';
+import { ProgressTracker } from '../utils/progressTracker';
 import Bottleneck from 'bottleneck';
 
 export class GupyAppService {
@@ -15,45 +16,61 @@ export class GupyAppService {
   ) {}
   
   async fetchAppData(): Promise<any[]> {
-    const limiter = new Bottleneck({ maxConcurrent: 3, minTime: 1 });
-    // const jobs = await this.jobClient.fetchJobs();
+    const limiter = new Bottleneck({
+      minTime: 1,
+      maxConcurrent: 10,  
+    });
+    const jobs = await this.jobClient.fetchJobs();
     // Test Jobs Data:
-    const jobs = [{ id: 918195 }];
-    const fullData: { jobId: number; applications: any[] }[] = [];
+    // const jobs = [{ id: 4448137 },{ id: 3197203 },{ id: 5631808 }];
+    const progressTracker = new ProgressTracker(jobs.length);
+
+    const fullData: any[] = [];
+    progressTracker.start();
 
     for (const job of jobs) {
       try {
+        // console.log(`Starting job ${job}...`);
+        
         const applications = await this.applicationClient.fetchApplications(job.id);
+        progressTracker.incrementRequests(applications.length);
 
-        const applicationsWithComments = await Promise.all(
-          applications.map(async (app) => {
+     const applicationsWithComments = await Promise.all(
+        applications.map((app) =>
+          limiter.schedule(async () => {
             try {
-              const comments = await limiter.schedule(() =>
-                this.commentClient.fetchComments(job.id, app.id)
-              );
+              // console.log(`Fetching comments for Job ${job.id} Application ${app.id}...`);
+              
+              const comments = await this.commentClient.fetchComments(job.id, app.id);
               return { ...app, comments };
             } catch (e) {
               this.logger.error(`Failed to fetch comments for app ${app.id}`, e);
               return { ...app, comments: [] };
             }
           })
-        );
+        )
+      );
 
-        const applicationsV2 = await this.applicationV2Client.fetchApplicationV2(job.id);
-        const applicationsV2Map = new Map(applicationsV2.map((a: any) => [a.id, a.expand.steps]));
+      const applicationsV2 = await limiter.schedule(() =>
+        this.applicationV2Client.fetchApplicationV2(job.id)
+      );
+      const applicationsV2Map = new Map(applicationsV2.map((a: any) => [a.id, a.expand.steps]));
 
-        const applicationsWithSteps = applicationsWithComments.map((a: any) => {
-          const steps = applicationsV2Map.get(a.id);
-          return { ...a, steps: steps || [] };
-        });
+      const applicationsWithSteps = applicationsWithComments.map((a: any) => {
+        const steps = applicationsV2Map.get(a.id);
+        return { ...a, steps: steps || [] };
+      });
 
-        fullData.push({ jobId: job.id, applications: applicationsWithSteps });
+      fullData.push(...applicationsWithSteps );
 
-      } catch (e) {
-        this.logger.error(`Failed to process job ${job.id}`, e);
-      }
+    } catch (e) {
+      this.logger.error(`Failed to process job ${job.id}`, e);
     }
 
+      progressTracker.incrementJob();
+    }
+
+    progressTracker.stop();
     return fullData;
   }
 

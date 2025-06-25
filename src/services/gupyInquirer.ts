@@ -12,7 +12,7 @@ export class GupyInquirer {
         choices: [
           '1✅ - Jobs Only', 
           '2✅ - Jobs and Applications', 
-          '3❌ - Stages', 
+          '3✅ - Stages', 
           '4❌ - Email Templates',
           '5❌ - Job Templates'
         ],
