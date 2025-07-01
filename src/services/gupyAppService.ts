@@ -15,12 +15,15 @@ export class GupyAppService {
     private logger = new Logger()
   ) {}
   
-  async fetchAppData(): Promise<any[]> {
+  async fetchAppData(gupyJobs: number[]): Promise<any[]> {
     const limiter = new Bottleneck({
       minTime: 1,
       maxConcurrent: 10,  
     });
-    const jobs = await this.jobClient.fetchJobs();
+    const jobs = gupyJobs.length ? 
+      gupyJobs 
+      : (await this.jobClient.fetchJobs()).map(job => job.id);
+      console.log(gupyJobs)
     // Test Jobs Data:
     // const jobs = [{ id: 4448137 },{ id: 3197203 },{ id: 5631808 }];
     const progressTracker = new ProgressTracker(jobs.length);
@@ -32,7 +35,7 @@ export class GupyAppService {
       try {
         // console.log(`Starting job ${job}...`);
         
-        const applications = await this.applicationClient.fetchApplications(job.id);
+        const applications = await this.applicationClient.fetchApplications(job);
         progressTracker.incrementRequests(applications.length);
 
      const applicationsWithComments = await Promise.all(
@@ -41,7 +44,7 @@ export class GupyAppService {
             try {
               // console.log(`Fetching comments for Job ${job.id} Application ${app.id}...`);
               
-              const comments = await this.commentClient.fetchComments(job.id, app.id);
+              const comments = await this.commentClient.fetchComments(job, app.id);
               return { ...app, comments };
             } catch (e) {
               this.logger.error(`Failed to fetch comments for app ${app.id}`, e);

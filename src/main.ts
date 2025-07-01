@@ -40,14 +40,17 @@ const gupyJobStageService = new GupyJobStageService(
   logger
 );
 
+// Filter jobs - for Jobs and Applications endpoints ONLY
+const gupyJobs: number[] = [];
+
 async function main() {
 
   const dataType = await gupyInquirer.typeInquirer();
   console.log("Selected Data Type: " + dataType);
 
   const dataFetch: Record<string, () => Promise<any[]>> = {
-      '1': () => gupyJobService.fetchJobData(),
-      '2': () => gupyAppService.fetchAppData(),
+      '1': () => gupyJobService.fetchJobData(gupyJobs),
+      '2': () => gupyAppService.fetchAppData(gupyJobs),
       '3': () => gupyJobStageService.fetchJobStageData(),
   }
 

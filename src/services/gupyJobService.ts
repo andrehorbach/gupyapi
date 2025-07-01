@@ -7,14 +7,18 @@ export class GupyJobService {
     private logger = new Logger()
   ) {}
   
-  async fetchJobData(): Promise<any[]> {
-    try {
-      const jobsData = await this.jobClient.fetchJobs();
-      return jobsData;
-    } catch (e) {
+async fetchJobData(gupyJobs: number[]): Promise<any[]> {
+  try {
+    const jobsData = await this.jobClient.fetchJobs();
+
+    const filteredJobs = gupyJobs.length
+      ? jobsData.filter((job) => gupyJobs.includes(job.id))
+      : jobsData;
+
+    return filteredJobs;
+      } catch (e) {
         this.logger.error("Failed to fetch jobs data.", e);
         return [];
+      }
     }
-  }
-
 }

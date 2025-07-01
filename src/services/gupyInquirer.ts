@@ -11,7 +11,7 @@ export class GupyInquirer {
         message: 'Which data do you want to retrieve?',
         choices: [
           '1✅ - Jobs Only', 
-          '2✅ - Jobs and Applications', 
+          '2✅ - Applications', 
           '3✅ - Stages', 
           '4❌ - Email Templates',
           '5❌ - Job Templates'

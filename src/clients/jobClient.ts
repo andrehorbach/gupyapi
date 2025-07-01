@@ -1,4 +1,6 @@
 import { BaseClient } from './baseClient';
+import { Logger } from '../utils/logger';
+import { ProgressTracker } from '../utils/progressTracker';
 import Bottleneck from 'bottleneck';
 
 export class JobClient extends BaseClient {
@@ -19,10 +21,10 @@ export class JobClient extends BaseClient {
 
     do {
       const page = currentPage;
+      console.log(`Fetching Jobs Page ${page}...`)
       const data = await this.limiter.schedule(() =>
         this.fetchJson<any>(`${this.BASE_URL_V1}/jobs?fields=all&page=${page}`)
       );
-
       results = results.concat(data.results);
       totalPages = data.totalPages;
       currentPage++;
