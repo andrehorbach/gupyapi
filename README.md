@@ -1,14 +1,14 @@
-# Gupy API
+# Gupy API Data Export
 
-This repository presents code to work with Gupy API. It provides these features:
+This repository contains code for interacting with the Gupy API. It includes the following features:
 
-Gupy API Data Fetch:
-- Fetch Jobs Data
-- Fetch Applications Data
-- Fetch Comments Data
-- Fetch Templates (E-mail / Jobs)
+📡 Gupy API Data Fetching:
+- Retrieve job listings
+- Retrieve application data
+- Retrieve comment threads
+- Retrieve templates (email and job templates)
 
-Gupy API Data Handling:
-- Store Jobs and Applications data to JSON File
-- Create .JSON files to store Templates data for further use (e.g.: Imports)
-- Extract Stages data for validation
+💾 Data Handling:
+- Save job and application data to .json files
+- Generate .json files from templates for future use (e.g., imports)
+- Extract stage information for validation and analysis
